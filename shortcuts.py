@@ -2,7 +2,7 @@ import numpy as np
 
 ####################################################################################################################################################################
 
-def matrix_inverse(A):
+def matrix_inverse(A,b):
     dim = np.shape(A)[0]
     Ainv = np.identity(dim)
     i = 0
@@ -39,12 +39,52 @@ def matrix_inverse(A):
             Ainv[[i,i+1]] = Ainv[[i+1,i]]
             b[[i,i+1]] = b[[i+1,i]]
     #Ainv = np.around(Ainv,5)
-    return Ainv
+    return Ainv,b
 
 ################################################################################################################################################################ 
 
+def matrix_inverse_pp(A,b):       
+    dim = np.shape(A)[0]
+    Ainv = np.identity(dim)
+    i = 0
+    while i < dim:             #Damit ich gehe ich jede Zeile schrittweise durch
+        u = i
+        while u < dim-1:                         #Partiell Pivoting
+            if A[i][i] < A[u+1][i]:
+                A[[i,u+1]] = A[[u+1,i]]
+                Ainv[[i,u+1]] = Ainv[[u+1,i]]
+                b[[i,u+1]] = b[[u+1,i]]
+            u = u + 1
+
+        c = A[i][i]                 #c ist der Vorfaktor vor dem (i,i)-Eintrag der Matrix
+        A[i] = A[i]/c            #Division der i-ten Zeile durch den Vorfaktor an Stelle i,i
+        Ainv[i] = Ainv[i]/c       #Selbiges mit der i-ten Zeile in der Einheitsmatrix
+
+        x = 0
+
+        while x < dim:              #Damit gehe ich jede Zeile durch, die ich von der i-ten Zeile subtrahieren muss
+            if x == i:
+                x = x + 1
+                continue
+
+            k = A[x][i]           #Koeffizient mit dem ich die Zeile i multiplizieren muss, damit ich Zeile i von i+1 abziehen kann
+
+            j = 0                   #Mit j gehe ich die Spalten alle durch
+
+            while j < dim:          #Damit ich gehe ich jede Spalte j in EINER Zeile durch
+                A[x][j] = A[x][j] - k*A[i][j]
+                Ainv[x][j] = Ainv[x][j] - k*Ainv[i][j]
+                j = j + 1
+            x = x + 1
+
+        i = i + 1
+    Ainv = np.around(Ainv,5)
+    return Ainv,b
+
+################################################################################################################################################################
+
 def lgs_solver(A,b):
-    Ainv = matrix_inverse(A)
+    Ainv,b_0 = matrix_inverse_pp(A,b)
     i = 0
     dim = np.shape(A)[0]
     x = np.zeros(dim)
@@ -53,11 +93,11 @@ def lgs_solver(A,b):
         buffer = 0
         j = 0
         while j < dim:
-            buffer = buffer + Ainv[i][j]*b[j]
+            buffer = buffer + Ainv[i][j]*b_0[j]
             j = j + 1
         x[i] += buffer
         i += 1
-    #x = np.around(x,5)
+    x = np.around(x,5)
     return x
 
 
@@ -127,7 +167,9 @@ def tridiag_LU_decomp(a,b,c,vecb):
     
     return L,R,x
 
- def matrix_dot(X,Y):
+###################################################################################################################################################################
+
+def matrix_dot(X,Y):
      row = np.shape(X)[0]
 
      coloumn = np.shape(Y)[1]
@@ -137,5 +179,6 @@ def tridiag_LU_decomp(a,b,c,vecb):
              for k in range(len(Y)):
                  result[i][j] += X[i][k] * Y[k][j]
      return result
+
 ##################################################################################################################################################################
     
