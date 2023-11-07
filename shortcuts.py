@@ -1,5 +1,7 @@
 import numpy as np
 
+####################################################################################################################################################################
+
 def matrix_inverse(A):
     dim = np.shape(A)[0]
     Ainv = np.identity(dim)
@@ -38,7 +40,9 @@ def matrix_inverse(A):
             b[[i,i+1]] = b[[i+1,i]]
     Ainv = np.around(Ainv,5)
     return Ainv
-    
+
+################################################################################################################################################################ 
+
 def lgs_solver(A,b):
     Ainv = matrix_inverse(A)
     i = 0
@@ -56,5 +60,46 @@ def lgs_solver(A,b):
     x = np.around(x,5)
     return x
 
-#def LU_decomp(A):
+
+################################################################################################################################################################
+
+def tridiag_LU_decomp(a,b,c):
+    N = np.shape(b)[0]
+    f = c
+
+    e = np.zeros(N)
+
+    d = np.zeros(N)          #ignorier den ersten Wert
+
+    e[0] = b[0]
+    d[1] = a[1]/e[0]
+
+    i = 1
+
+    while i < N:                    #BERECHNUNG VON e,d,f. FUNKTIONIERT
+        e[i] = b[i] - d[i]*f[i-1]
+        if (i+1) == N:
+            i = i + 1
+            continue
+        d[i+1] = a[i+1]/e[i]
+        i += 1
+
+
+    L = np.identity(N)
+    R = np.identity(N)
+
+    j = 0
+
+    while j < N:                                      #EINSETZEN IN MATRIZEN L,R FUNKTIONIERT!
+        R[j][j] = e[j]
+        if j == N-1:
+            j += 1
+            continue
+        L[j+1][j] = d[j+1]
+        R[j][j+1] = f[j]
+        j += 1
+    
+    return L,R
+
+##################################################################################################################################################################
     
