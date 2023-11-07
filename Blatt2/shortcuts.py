@@ -56,5 +56,5 @@ def lgs_solver(A,b):
     x = np.around(x,5)
     return x
 
-def LU_decomp(A):
+#def LU_decomp(A):
     
