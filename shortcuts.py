@@ -38,7 +38,7 @@ def matrix_inverse(A):
             A[[i,i+1]] = A[[i+1,i]]
             Ainv[[i,i+1]] = Ainv[[i+1,i]]
             b[[i,i+1]] = b[[i+1,i]]
-    Ainv = np.around(Ainv,5)
+    #Ainv = np.around(Ainv,5)
     return Ainv
 
 ################################################################################################################################################################ 
@@ -57,7 +57,7 @@ def lgs_solver(A,b):
             j = j + 1
         x[i] += buffer
         i += 1
-    x = np.around(x,5)
+    #x = np.around(x,5)
     return x
 
 
@@ -126,6 +126,16 @@ def tridiag_LU_decomp(a,b,c,vecb):
         i -= 1
     
     return L,R,x
+
+def matrix_dot(X,Y):
+    row = np.shape(X)[0]
+    coloumn = np.shape(Y)[1]
+    result = np.zeros(row,coloumn)
+    for i in range(len(X)):
+        for j in range(len(Y[0])):
+            for k in range(len(Y)):
+                result[i][j] += X[i][k] * Y[k][j]
+    return result
 
 ##################################################################################################################################################################
     
