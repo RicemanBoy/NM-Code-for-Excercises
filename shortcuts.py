@@ -63,7 +63,7 @@ def lgs_solver(A,b):
 
 ################################################################################################################################################################
 
-def tridiag_LU_decomp(a,b,c):
+def tridiag_LU_decomp(a,b,c,vecb):
     N = np.shape(b)[0]
     f = c
 
@@ -84,7 +84,6 @@ def tridiag_LU_decomp(a,b,c):
         d[i+1] = a[i+1]/e[i]
         i += 1
 
-
     L = np.identity(N)
     R = np.identity(N)
 
@@ -99,7 +98,34 @@ def tridiag_LU_decomp(a,b,c):
         R[j][j+1] = f[j]
         j += 1
     
-    return L,R
+    x = np.zeros(N)
+
+    y = np.zeros(N)
+
+    y[0] = vecb[0]
+
+    i = 1
+    while i < N:                          #Berechnung von y, FUNKTIONIERT, HABS GECHECKT
+        j = 0
+        y[i] = vecb[i]
+        while j < i:
+            y[i] -= L[i][j]*y[j]
+            j += 1
+        i += 1
+
+    x[N-1] = y[N-1]/(R[N-1][N-1])
+
+    i = N-2                                 #Berechnung von x, FUNKTIONIERT HABS GETESTET
+    while i >= 0:
+        j = N-1
+        x[i] = y[i]
+        while j > i:
+            x[i] -=  R[i][j]*x[j]
+            j -= 1
+        x[i] = x[i]/R[i][i]
+        i -= 1
+    
+    return L,R,x
 
 ##################################################################################################################################################################
     
