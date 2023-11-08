@@ -170,15 +170,27 @@ def tridiag_LU_decomp(a,b,c,vecb):
 ###################################################################################################################################################################
 
 def matrix_dot(X,Y):
-     row = np.shape(X)[0]
+    
+    if len(np.shape(Y)) < 2:
+        row = np.shape(X)[0]
+        coloumn = 1
+        result = np.zeros(row,coloumn)
+        for i in range(len(X)):
+            for j in range(len(Y[0])):
+                for k in range(len(Y)):
+                    result[i][j] += X[i][k] * Y[k][j]
+    else:
+     
+        row = np.shape(X)[0]
 
-     coloumn = np.shape(Y)[1]
-     result = np.zeros(row,coloumn)
-     for i in range(len(X)):
-         for j in range(len(Y[0])):
-             for k in range(len(Y)):
-                 result[i][j] += X[i][k] * Y[k][j]
-     return result
+        coloumn = np.shape(Y)[1]
+        result = np.zeros(row,coloumn)
+        for i in range(len(X)):
+            for j in range(len(Y[0])):
+                for k in range(len(Y)):
+                    result[i][j] += X[i][k] * Y[k][j]
+
+    return result
 
 ##################################################################################################################################################################
 
