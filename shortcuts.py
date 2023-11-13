@@ -258,4 +258,41 @@ def lgs_solver_crout(A,b):
     return x
 
 ########################################################################################################################################################################
+
+def neville_algorithm(x,m,xdata,ydata):
+    size = np.shape(xdata)[0]
+
+    loc = 0
+    i = 0
+    while i < size-1:
+        if xdata[i] <= x <= xdata[i+1]:
+            loc = i
+        i += 1
+    
+    if x >= xdata[size-1]:
+        loc = size - 1
+    
+    P = np.asfarray([])
+    for i in range(size):                               #Erster Iterationsschritt
+        P = np.append(P,ydata[i])
+
+    k = 1                                               #k entspricht der Ordnung der Polynome
+
+    while k < m:                                        #Ab hier werden die höheren Polynome bestimmt, angefangen mit linearer Ordnung (k=1)
+        i = 0
+        P_higher_order = np.zeros(size-k)
+        while (i+k) < size:
+            P_higher_order[i] = ((x-xdata[i+k])*P[i]+(xdata[i]-x)*P[i+1])/(xdata[i]-xdata[i+k])
+            i += 1
+        P = P_higher_order
+        k += 1
+    
+    loc = loc - m + 1
+
+    if loc <= 0:
+        loc = 0
+
+    return P[loc]
+
+#############################################################################################################################################################################
     
