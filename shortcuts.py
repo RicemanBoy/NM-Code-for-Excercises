@@ -288,10 +288,13 @@ def neville_algorithm(x,m,xdata,ydata):
         P = P_higher_order
         k += 1
     
-    loc = loc - m + 1
+    loc = loc - m + 2
 
     if loc <= 0:
         loc = 0
+        
+    if loc > np.size(P)-1:
+        loc = np.size(P)-1
 
     return P[loc]
 
