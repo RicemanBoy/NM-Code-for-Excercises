@@ -300,3 +300,70 @@ def neville_algorithm(x,m,xdata,ydata):
 
 #############################################################################################################################################################################
     
+
+def cubic_spline_interpolation(x,xdata,ydata):
+    N = np.shape(xdata)[0]                             #Anzahl der Stützpunkte xdata_i
+    
+    loc = 0
+
+    i = 0
+
+    while i < N-1:
+        if xdata[i] <= x < xdata[i+1]:
+            loc = i
+        i += 1
+
+    if x >= xdata[N-1]:
+        loc = N - 2                                      #loc ist bei unterem Stützpunkt, also bei j
+
+    
+    matrix = np.zeros((N-2,N-2))
+    b = np.zeros(N-2)
+
+    #Fall: j = 1, erste Zeile der Matrix mit nur 2 Elementen, statt 3
+
+    matrix[0][0] = (xdata[2]-xdata[0])/3                            #y1''
+    matrix[0][1] = (xdata[2]-xdata[1])/6                            #y2''
+    b[0] = ((ydata[2]-ydata[1])/(xdata[2]-xdata[1]))-((ydata[1]-ydata[0])/(xdata[1]-xdata[0]))
+
+    j = 2
+
+    i = 1
+    while i < N-3:
+        matrix[i][i-1] = (xdata[j]-xdata[j-1])/6
+        matrix[i][i] = (xdata[j+1]-xdata[j-1])/3
+        matrix[i][i+1] = (xdata[j+1]-xdata[j])/6
+        b[i] = ((ydata[j+1]-ydata[j])/(xdata[j+1]-xdata[j]))-((ydata[j]-ydata[j-1])/(xdata[j]-xdata[j-1]))
+        j += 1
+        i += 1
+
+    
+    #Fall: j = N - 3, letzte Zeile der Matrix mit nur 2 Elementen, statt 3
+
+    matrix[N-3][N-4] = (xdata[N-2]-xdata[N-3])/6
+    matrix[N-3][N-3] = (xdata[N-1]-xdata[N-3])/3
+    b[N-3] = ((ydata[N-1]-ydata[N-2])/(xdata[N-1]-xdata[N-2]))-((ydata[N-2]-ydata[N-3])/(xdata[N-2]-xdata[N-3]))
+ 
+    
+    y2 = np.asfarray([0])
+    y2 = np.append(y2, lgs_solver_crout(matrix,b))
+    y2 = np.append(y2,0)
+
+    if loc > np.size(y2)-2:
+        loc = np.size(y2) - 2
+
+    A = (xdata[loc+1]-x)/(xdata[loc+1]-xdata[loc])
+    B = 1 - A
+
+    ylinear = A*ydata[loc] + B*ydata[loc+1]
+
+    C = (1/6)*((A**3)-A)*((xdata[loc+1]-xdata[loc])**2)
+    D = (1/6)*((B**3)-B)*((xdata[loc+1]-xdata[loc])**2)
+
+    p = C*y2[loc] + D*y2[loc+1]
+
+    y = ylinear + p
+    
+    return y
+
+#######################################################################################################################################################################################
