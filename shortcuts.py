@@ -420,3 +420,152 @@ def integral_ext_simp(f,a,b,N):                         #funktioniert
 
 #######################################################################################################################################################################################
 
+#Romberg integration ohne Extrapolation, am präsizesten, aber auch am aufwendigsten
+
+def integral_romberg(f,a,b,eps):
+
+    g = 0
+    if b < a:
+        z = a
+        a = b
+        b = z
+        g = 1
+    
+    h = b - a 
+
+    x = np.asfarray([h**2])
+    y = np.asfarray([])
+
+    Inew = 0
+                                        
+    I0 = (h/2)*(f(a)+f(b))
+    y = np.append(y,I0)
+
+    In = I0
+    In1 = 0.5*(I0 + h*f(a+0.5*b))
+
+    i = 2
+    o = 0
+    z = 0
+    
+    while o < 1:
+
+        if np.abs((In1-In)) > np.abs(eps*In):
+            k = 0
+            sum = 0
+            deltan = (h/(2**(i-1)))
+
+            In = In1
+            
+            while k <= (2**(i-1)-1):
+                sum += f(a+(k+0.5)*deltan)
+                k += 1
+
+            Inew = deltan*sum
+
+            In1 = 0.5*(In+Inew)
+
+            y = np.append(y,In1)
+            i += 1
+        else:
+            o += 1
+            
+    for j in range(i-2):
+        x = np.append(x,(h/(2*(j+1)))**2)
+
+    I_final = y[np.size(y)-1]
+
+    if g == 1:
+        return -I_final,y
+
+    return I_final,y
+    
+#######################################################################################################################################################################################
+
+#Romberg integration mit Neville-Extrapolation (hier durch order gegeben. order 1 entspricht linear usw., order 1 ist am präsizesten), effizienter als ohne
+
+def integral_romberg(f,a,b,eps,order):
+
+    g = 0
+    if b < a:
+        z = a
+        a = b
+        b = z
+        g = 1
+
+    h = b - a 
+
+    x = np.asfarray([h**2])
+    y = np.asfarray([])
+
+    Inew = 0
+                                        
+    I0 = (h/2)*(f(a)+f(b))
+    y = np.append(y,I0)
+
+    In = I0
+    In1 = 0.5*(I0 + h*f(a+0.5*b))
+
+    i = 2
+    
+
+    while i < 3+order:
+        k = 0
+        sum = 0
+        deltan = (h/(2**(i-1)))
+
+        In = In1
+        
+        while k <= (2**(i-1)-1):
+            sum += f(a+(k+0.5)*deltan)
+            k += 1
+
+        Inew = deltan*sum
+
+        In1 = 0.5*(In+Inew)
+
+        y = np.append(y,In1)
+        x = np.append(x,(h/(2**i))**2)
+        i += 1
+
+
+    x1 = np.delete(x,0)
+    y1 = np.delete(y,0)
+
+    x = np.delete(x, np.size(x)-1)
+    y = np.delete(y, np.size(y)-1)
+
+    o = 0
+    while o < 1:
+
+        if np.abs(neville_algorithm(0,order,x1,y1)-neville_algorithm(0,order,x,y)) > np.abs(eps*neville_algorithm(0,order,x1,y1)):
+            k = 0
+            sum = 0
+            deltan = (h/(2**(i-1)))
+
+            In = In1
+            
+            while k <= (2**(i-1)-1):
+                sum += f(a+(k+0.5)*deltan)
+                k += 1
+
+            Inew = deltan*sum
+
+            In1 = 0.5*(In+Inew)
+
+            x = x1
+            y = y1
+            y1 = np.append(y1,In1)
+            x1 = np.append(x1,(h/(2**i))**2)
+            x1 = np.delete(x1,0)
+            y1 = np.delete(y1,0)
+
+            i += 1
+        else:
+            if g == 1:
+                return -y1[np.size(y1)-1],i
+            else:
+                return y1[np.size(y1)-1],i
+
+#######################################################################################################################################################################################
+    
