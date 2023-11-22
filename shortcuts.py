@@ -484,7 +484,7 @@ def integral_romberg(f,a,b,eps):
 
 #Romberg integration mit Neville-Extrapolation (hier durch order gegeben. order 1 entspricht linear usw., order 1 ist am präsizesten), effizienter als ohne
 
-def integral_romberg(f,a,b,eps,order):
+def integral_romberg_extrapol(f,a,b,eps,order):
 
     g = 0
     if b < a:
