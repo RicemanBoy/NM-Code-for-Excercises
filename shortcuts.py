@@ -384,7 +384,7 @@ def integral_ext_trap(f,a,b,N):                     #funktioniert
         area = 0.5*(f(a)+f(b))
         i = 1
         while i <= N:
-            area += f(i)
+            area += f(x+i*h)
             i += 1
         area = -h*area
     return area
