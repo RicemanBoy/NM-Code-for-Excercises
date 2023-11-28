@@ -568,4 +568,79 @@ def integral_romberg_extrapol(f,a,b,eps,order):
                 return y1[np.size(y1)-1],i
 
 #######################################################################################################################################################################################
+
+def secante(x0,x1,f,precision):
+    counter = 0
+
+    a0 = x0
+    a1 = x1
+
+    i  = 0
+
+    while i < 1:
+        
+        if np.abs(f(a1)) > precision:
+            a0  = ((f(a1))/(f(a0)-f(a1)))*(a1-a0) + a1
+            counter += 1
+            if np.abs(f(a0)) > precision:
+                a1  = ((f(a0))/(f(a1)-f(a0)))*(a0-a1) + a0
+                counter += 1  
+            else:
+                return counter, a0
+        else:
+            return counter, a1
+
+#######################################################################################################################################################################################
+
+def regula_falsi(x0,x1,f,precision):
+    counter = 0
+
+    a = x0
+    b = x1
+
+    anew = 0
+
+    i  = 0
+
+    while i < 1:
+        
+        if np.abs(f(anew)) > precision:
+            anew  = ((f(b))/(f(a)-f(b)))*(b-a) + b
+            counter += 1
+            if f(b)*f(anew) < 0:
+                b = anew
+                a = a
+            else:
+                b = b
+                a = anew
+        else:
+            return counter, anew
+        
+#######################################################################################################################################################################################     
+
+def bisection(x0,x1,f,precision):
+    counter = 0
+    eps = np.abs(x1 - x0)
+    i = 0
+    a = x0
+    b = x1
+    while i < 1:
+        if np.abs(f(a)) > precision and np.abs(f(b)) > precision:
+            if f(a)*f(a+0.5*eps) < 0:
+                a = a
+                b = a + 0.5*eps
+                eps = eps/2
+                counter += 1
+            else:
+                a = a + 0.5*eps
+                b = b
+                eps = eps/2
+                counter += 1
+        else:
+            if np.abs(f(a)) > precision:
+                return counter, a
+            else:
+                return counter, b
+
+#######################################################################################################################################################################################   
     
