@@ -186,7 +186,7 @@ def matrix_dot(X,Y):
         row = np.shape(X)[0]
 
         coloumn = np.shape(Y)[1]
-        result = np.zeros(row,coloumn)
+        result = np.zeros((row,coloumn))
         for i in range(len(X)):
             for j in range(len(Y[0])):
                 for k in range(len(Y)):
@@ -644,3 +644,56 @@ def bisection(x0,x1,f,precision):
 
 #######################################################################################################################################################################################   
     
+def QL(A,step):
+
+    dim = np.shape(A)[0]
+
+    # sum = 0                           just to check, whether A stays symmetric, yes it does
+
+    for o in range(step):
+
+        Q = np.identity(dim)
+
+        for i in range(dim-1):
+            q = dim - 1 - i
+            p = q - 1
+
+            t = -((A[p][q])/(A[q][q]))
+            #c = A[q][q]/((A[p][q]**2+A[q][q]**2)**0.5)
+            #s = -A[q][p]/((A[q][p]**2+A[q][q]**2)**0.5)
+            c = 1/(((t**2)+1)**0.5)
+            s = t*c
+            P = np.identity(dim)
+            P[p][p] = c
+            P[q][q] = c
+            P[p][q] = s
+            P[q][p] = -s
+
+            if i == 0:
+                Q = transpose(P)
+                continue
+
+            Pt = transpose(P)
+            Q = matrix_dot(Q, Pt)
+
+        Qt = transpose(Q)
+
+        L = matrix_dot(Qt,A)
+
+        A = matrix_dot(L,Q)
+
+    return A
+
+#######################################################################################################################################################################################   
+
+def transpose(A):
+    row = np.shape(A)[0]
+    col = np.shape(A)[1]
+    row, col = col, row
+    At = np.zeros((row,col))
+    for i in range(row):
+        for j in range(col):
+            At[i][j] = A[j][i]
+    return At
+
+#######################################################################################################################################################################################
