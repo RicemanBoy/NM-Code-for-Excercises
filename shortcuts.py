@@ -644,45 +644,43 @@ def bisection(x0,x1,f,precision):
 
 #######################################################################################################################################################################################   
     
-def QL(A,step):
-
+def QL(A,precision):
     dim = np.shape(A)[0]
-
-    # sum = 0                           just to check, whether A stays symmetric, yes it does
-
-    for o in range(step):
-
+    delta = 1
+    steps = 0
+    while np.abs(delta) > precision:
+        B = A
         Q = np.identity(dim)
-
         for i in range(dim-1):
             q = dim - 1 - i
             p = q - 1
-
             t = -((A[p][q])/(A[q][q]))
             #c = A[q][q]/((A[p][q]**2+A[q][q]**2)**0.5)
             #s = -A[q][p]/((A[q][p]**2+A[q][q]**2)**0.5)
-            c = 1/(((t**2)+1)**0.5)
-            s = t*c
+            cos = 1/(((t**2)+1)**0.5)
+            sin = t*cos
             P = np.identity(dim)
-            P[p][p] = c
-            P[q][q] = c
-            P[p][q] = s
-            P[q][p] = -s
-
+            P[p][p] = cos
+            P[q][q] = cos
+            P[p][q] = sin
+            P[q][p] = -sin
             if i == 0:
                 Q = transpose(P)
+                #Q = np.transpose(P)
                 continue
-
-            Pt = transpose(P)
-            Q = matrix_dot(Q, Pt)
-
+            #Q = np.dot(Q,np.transpose(P))
+            Q = matrix_dot(Q, transpose(P))
+        #Qt = np.transpose(Q)
         Qt = transpose(Q)
-
+        #L = np.dot(Qt,A)
         L = matrix_dot(Qt,A)
-
+        #A = np.dot(L,Q)
         A = matrix_dot(L,Q)
-
-    return A
+        delta = 0
+        for j in range(dim):
+            delta += np.abs(A[j][j]-B[j][j])
+        steps += 1
+    return A, steps
 
 #######################################################################################################################################################################################   
 
