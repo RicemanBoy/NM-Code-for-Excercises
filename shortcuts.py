@@ -1,4 +1,5 @@
 import numpy as np
+import copy
 
 ####################################################################################################################################################################
 
@@ -693,5 +694,39 @@ def transpose(A):
         for j in range(col):
             At[i][j] = A[j][i]
     return At
+
+#######################################################################################################################################################################################
+
+def bit_reverse(f):
+    j = 0
+    N = len(f)
+    for i in range(N):
+        if j>i:
+            f[j], f[i] = f[i], f[j]
+        m = int(N/2)
+        while m>=2 and j>=m:
+            j = j-m
+            m = int(m/2)
+        j = j + m
+    return f
+
+#######################################################################################################################################################################################
+
+def W(n,k):
+    return np.exp((2*np.pi*1j*k)/n)
+
+def fft(F):
+    bit_reverse(F)
+    N = len(F)
+    steps = int(np.log2(N))                           #steps = 2, =how many steps I gotta do, also number of indices in binary
+    Fnew = np.zeros(N,dtype=complex)
+    for l in range(1,steps+1,1):                          #l = 1,2
+        blocks = int(np.round(N/(2**l)))                    #blocks = 2,1
+        elem = 2**l                         # #Elements per Block, elem = 2,4
+        for i in range(blocks):                          #i = (0,1),0
+            for k in range(2**l):                               #k = (0,1),(0,1,2,3)
+                Fnew[i*elem+k] = F[i*elem+np.mod(k,2**(l-1))] + W(elem,k)*F[i*elem+np.mod(k,2**(l-1))+2**(l-1)]
+        F = copy.deepcopy(Fnew)
+    return F
 
 #######################################################################################################################################################################################
